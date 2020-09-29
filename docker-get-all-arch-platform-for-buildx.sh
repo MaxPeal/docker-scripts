@@ -1,3 +1,5 @@
+#!/bin/sh
+
 docker buildx ls | cut -d" " -f1 | grep -v "/" | \
   while read line; do
    docker buildx rm $line

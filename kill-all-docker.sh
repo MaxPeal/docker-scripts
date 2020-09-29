@@ -1,4 +1,5 @@
-kill-all-docker() {
+#!/bin/sh
+kill_all_docker() {
 set -x
 echo "#######################################"
 docker system df

@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 function install_docker_buildx() {
 #HFILE=buildx HASHcmd=sha256sum HASHSUM=3f4e77686659766a0726b5a47a87e2cc14c86ebf15abf7f19c45d23b0daff222 HURL=https://github.com/docker/buildx/releases/download/v0.4.1/buildx-v0.4.1.linux-amd64
 #HFILE=docker-buildx HDIR=~/.docker/cli-plugins HASHcmd=sha256sum HASHSUM=3f4e77686659766a0726b5a47a87e2cc14c86ebf15abf7f19c45d23b0daff222 HURL=https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.1.linux-amd64
@@ -56,9 +58,10 @@ _sudo() {
 
 
 _sudo sh -xec '
-	mkdir -p /etc/docker
+	[ -e /etc/docker ] || mkdir -p /etc/docker
 	[ -s /etc/docker/daemon.json ] || echo "{}" > /etc/docker/daemon.json
 '
+[ -e $HOME/.docker ] || mkdir -p $HOME/.docker
 [ -s $HOME/.docker/config.json ] || echo "{}" > $HOME/.docker/config.json
 
 
@@ -88,20 +91,25 @@ DockerCexperimental=$(docker version --format '{{.Client.Experimental}}' 2>/dev/
 if [[ "$DockerCexperimental" != "true" ]]; then
   # Enable docker cli experimental support (for 'docker build --squash').
   DockerCconfig="$HOME/.docker/config.json"
-  mkdir -p $HOME/.docker/
-  if [[ -e "$DockerCconfig" ]]; then
-    _sudo sed -i -e 's/{/{ "experimental": true, /' "$DockerCconfig"
+  if [[ -s "$DockerCconfig" ]]; then
+    #sed -i -e 's/{/{ "experimental": true, /' "$DockerCconfig"
+cat "$DockerCconfig" | jq '.experimental = "enabled"' >> "$DockerCconfig-tmp"
+# see https://stackoverflow.com/questions/44346322/how-to-run-docker-with-experimental-functions-on-ubuntu-16-04
+#+#    cat "$DockerCconfig" | jq '.experimental = true' >> "$DockerCconfig-tmp"
     #_sudo sed -i -e 's/{/{ "aliases": { "builder": "buildx" }, /' "$DockerCconfig"
     #sed -i -e 's/{/{ "aliases": [ "builder": "buildx" ],\n/' "$DockerCconfig"
     #cat "$DockerCconfig" | jq -M -S | sed -e 's/^{/{ "aliases": { "builder": "buildx" } ,\n/1' | jq -M -S >
-    cat "$DockerCconfig" | jq -M | sed -e 's/^{/{ "aliases": { "builder": "buildx" } ,\n/1' | jq -M >> $DockerCconfig-tmp
+#    cat "$DockerCconfig" | jq -M | sed -e 's/^{/{ "aliases": { "builder": "buildx" } ,\n/1' | jq -M >> $DockerCconfig-tmp
+     cat "$DockerCconfig-tmp" | jq '.aliases .builder = "buildx"' > $DockerCconfig-tmp2 && mv $DockerCconfig-tmp2 $DockerCconfig-tmp
 #cat $DockerCconfig-tmp | jq --arg aliases builder
     cp -p "$DockerCconfig" "$DockerCconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && mv "$DockerCconfig-tmp" "$DockerCconfig" || exit 1;
 else
     #echo '{ "experimental": true }' | _sudo tee "$DockerCconfig"
-    echo {} | tee -a "$DockerCconfig"
-    echo {} | jq '.experimental = true' >> "$DockerSconfig-tmp"
-    #_sudo touch "$DockerCconfig"
+    echo {} | tee "$DockerCconfig"
+echo {} | jq '.experimental = "enabled"' >> "$DockerSconfig-tmp"
+#+# echo {} | jq '.experimental = true' >> "$DockerSconfig-tmp"
+       #_sudo touch "$DockerCconfig"
+    cat "$DockerCconfig-tmp" | jq '.aliases .builder = "buildx"' > $DockerCconfig-tmp2 && mv $DockerCconfig-tmp2 $DockerCconfig-tmp
     cp -p "$DockerCconfig" "$DockerCconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && mv "$DockerCconfig-tmp" "$DockerCconfig" || exit 1;
   fi
   #_dockerRESTART
@@ -112,15 +120,14 @@ fi
 if [[ "$DockerSexperimental" != "true" ]]; then
   # Enable docker daemon experimental support (for 'docker build --squash').
   DockerSconfig='/etc/docker/daemon.json'
-  mkdir -p /etc/docker/
-  if [[ -e "$DockerSconfig" ]]; then
+  if [[ -s "$DockerSconfig" ]]; then
     #_sudo sed -i -e 's/{/{\n"experimental": true,\n/' "$DockerSconfig"
     _sudo cat "$DockerSconfig" | jq '.experimental = true' >> "$DockerSconfig-tmp"
     _sudo cp -p "$DockerSconfig" "$DockerSconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerSconfig-tmp" "$DockerSconfig" || exit 1;
   else
-    _sudo echo {} | tee -a "$DockerSconfig"
+    _sudo echo {} | tee "$DockerSconfig"
     #_sudo echo {} | jq '.experimental = true' >> "$DockerSconfig-tmp"
-    _sudo cat "$DockerSconfig"  jq '.experimental = true' >> "$DockerSconfig-tmp"
+    _sudo cat "$DockerSconfig" | jq '.experimental = true' >> "$DockerSconfig-tmp"
     _sudo cp -p "$DockerSconfig" "$DockerSconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerSconfig-tmp" "$DockerSconfig" || exit 1;
     #echo '{ "experimental": true }' | $SUDO tee "$DockerSconfig"
   fi
