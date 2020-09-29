@@ -27,18 +27,18 @@ chmod a+x ~/.docker/cli-plugins/docker-buildx
   #+#docker buildx inspect --bootstrap
 }
 
+_dockerRESTART() {
+  if [ -d /run/systemd/system ] && command -v systemctl; then
+	_sudo systemctl --quiet stop docker || :
+	_sudo systemctl start docker
+	_sudo systemctl --full --no-pager status docker
+   else
+	_sudo service docker stop &> /dev/null || :
+	_sudo service docker start
+   fi
+   docker version
+}
 
-#BUILDX=$(command -v buildx)
-#BUILDX=$(command -v docker-buildx)
-#DOCKER_BUILDX_CLI_PLUGIN_PATH=~/.docker/cli-plugins/docker-buildx
-
-#DockerServerVersion=$(docker info --format '{{.ServerVersion}}')
-#DockerSexperimental=$(docker info --format '{{.ExperimentalBuild}}')
-
-DockerServerVersion=$(docker version --format '{{.Server.Version}}' || docker info --format '{{.ServerVersion}}')
-DockerSexperimental=$(docker version --format '{{.Server.Experimental}}' || docker info --format '{{.ExperimentalBuild}}')
-DockerClientVersion=$(docker version --format '{{.Client.Version}}')
-DockerCexperimental=$(docker version --format '{{.Client.Experimental}}')
 
 uid="$(id -u)"
 _sudo() {
@@ -54,22 +54,26 @@ _sudo() {
 	fi
 }
 
-_dockerRESTART() {
-  if [ -d /run/systemd/system ] && command -v systemctl; then
-	_sudo systemctl --quiet stop docker || :
-	_sudo systemctl start docker
-	_sudo systemctl --full --no-pager status docker
-   else
-	_sudo service docker stop &> /dev/null || :
-	_sudo service docker start
-   fi
-   docker version
-}
 
 _sudo sh -xec '
 	mkdir -p /etc/docker
 	[ -s /etc/docker/daemon.json ] || echo "{}" > /etc/docker/daemon.json
 '
+[ -s $HOME/.docker/config.json ] || echo "{}" > $HOME/.docker/config.json
+
+
+#BUILDX=$(command -v buildx)
+#BUILDX=$(command -v docker-buildx)
+#DOCKER_BUILDX_CLI_PLUGIN_PATH=~/.docker/cli-plugins/docker-buildx
+
+#DockerServerVersion=$(docker info --format '{{.ServerVersion}}')
+#DockerSexperimental=$(docker info --format '{{.ExperimentalBuild}}')
+
+DockerServerVersion=$(docker version --format '{{.Server.Version}}' || docker info --format '{{.ServerVersion}}')
+DockerSexperimental=$(docker version --format '{{.Server.Experimental}}' || docker info --format '{{.ExperimentalBuild}}')
+DockerClientVersion=$(docker version --format '{{.Client.Version}}')
+DockerCexperimental=$(docker version --format '{{.Client.Experimental}}')
+
 
 #SUDO=$(command -v sudo)
 
