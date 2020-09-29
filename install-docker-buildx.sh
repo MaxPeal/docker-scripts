@@ -3,6 +3,7 @@
 set -x
 
 function install_docker_buildx() {
+set -x
 #HFILE=buildx HASHcmd=sha256sum HASHSUM=3f4e77686659766a0726b5a47a87e2cc14c86ebf15abf7f19c45d23b0daff222 HURL=https://github.com/docker/buildx/releases/download/v0.4.1/buildx-v0.4.1.linux-amd64
 #HFILE=docker-buildx HDIR=~/.docker/cli-plugins HASHcmd=sha256sum HASHSUM=3f4e77686659766a0726b5a47a87e2cc14c86ebf15abf7f19c45d23b0daff222 HURL=https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.1.linux-amd64
 HFILE=docker-buildx HDIR=~/.docker/cli-plugins HASHcmd=sha256sum HASHSUM=c21f07356de93a4fa5d1b7998252ea5f518dbe94ae781e0edeec7d7e29fdf899 HURL=https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.2.linux-amd64
@@ -30,7 +31,8 @@ chmod a+x ~/.docker/cli-plugins/docker-buildx
 }
 
 _dockerRESTART() {
-  if [ -d /run/systemd/system ] && command -v systemctl; then
+set -x
+   if [ -d /run/systemd/system ] && command -v systemctl; then
 	_sudo systemctl --quiet stop docker || :
 	_sudo systemctl start docker
 	_sudo systemctl --full --no-pager status docker
@@ -44,6 +46,7 @@ _dockerRESTART() {
 
 uid="$(id -u)"
 _sudo() {
+set -x
 	if [ "$uid" = '0' ]; then
 		"$@"
 	else
