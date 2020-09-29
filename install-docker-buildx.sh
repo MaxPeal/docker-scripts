@@ -91,6 +91,7 @@ if [[ "DockerSexperimental" != true ]]; then
     _sudo cp -p "$DockerSconfig" "$DockerSconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerSconfig-tmp" "$DockerSconfig" || exit 1;
   else
     _sudo echo {} | jq '.experimental = true' >> "$DockerSconfig-tmp"
+    _sudo touch "$DockerSconfig"
     _sudo cp -p "$DockerSconfig" "$DockerSconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerSconfig-tmp" "$DockerSconfig" || exit 1;
     #echo '{ "experimental": true }' | $SUDO tee "$DockerSconfig"
   fi
@@ -113,6 +114,7 @@ if [[ "DockerCexperimental" != true ]]; then
 else
     #echo '{ "experimental": true }' | _sudo tee "$DockerCconfig"
     _sudo echo {} | jq '.experimental = true' >> "$DockerSconfig-tmp"
+    _sudo touch "$DockerCconfig"
     _sudo cp -p "$DockerCconfig" "$DockerCconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerCconfig-tmp" "$DockerCconfig" || exit 1;
   fi
   #_dockerRESTART
