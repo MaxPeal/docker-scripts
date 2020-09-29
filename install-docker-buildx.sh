@@ -69,10 +69,10 @@ _sudo sh -xec '
 #DockerServerVersion=$(docker info --format '{{.ServerVersion}}')
 #DockerSexperimental=$(docker info --format '{{.ExperimentalBuild}}')
 
-DockerServerVersion=$(docker version --format '{{.Server.Version}}' || docker info --format '{{.ServerVersion}}')
-DockerSexperimental=$(docker version --format '{{.Server.Experimental}}' || docker info --format '{{.ExperimentalBuild}}')
-DockerClientVersion=$(docker version --format '{{.Client.Version}}')
-DockerCexperimental=$(docker version --format '{{.Client.Experimental}}')
+DockerServerVersion=$(docker version --format '{{.Server.Version}}' 2>/dev/null || docker info --format '{{.ServerVersion}}' 2>/dev/null)
+DockerSexperimental=$(docker version --format '{{.Server.Experimental}}' 2>/dev/null || docker info --format '{{.ExperimentalBuild}}' 2>/dev/null)
+DockerClientVersion=$(docker version --format '{{.Client.Version}}' 2>/dev/null)
+DockerCexperimental=$(docker version --format '{{.Client.Experimental}}' 2>/dev/null)
 
 
 #SUDO=$(command -v sudo)
@@ -85,7 +85,7 @@ DockerCexperimental=$(docker version --format '{{.Client.Experimental}}')
 # docker version --format '{{json .}}' | jq
 
 
-if [[ "DockerCexperimental" != true ]]; then
+if [[ "$DockerCexperimental" != "true" ]]; then
   # Enable docker cli experimental support (for 'docker build --squash').
   DockerCconfig="$HOME/.docker/config.json"
   mkdir -p $HOME/.docker/
@@ -109,7 +109,7 @@ else
 fi
 
 # echo '{"registry-mirrors": [ "http://10.16.1.163:5000" ], "max-concurrent-downloads": 5, "hosts" : ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}' >> $DockerSconfig-tmp
-if [[ "DockerSexperimental" != true ]]; then
+if [[ "$DockerSexperimental" != "true" ]]; then
   # Enable docker daemon experimental support (for 'docker build --squash').
   DockerSconfig='/etc/docker/daemon.json'
   mkdir -p /etc/docker/
