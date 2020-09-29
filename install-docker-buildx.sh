@@ -80,24 +80,6 @@ _sudo sh -xec '
 # docker version --format '{{json .}}'
 # docker version --format '{{json .}}' | jq
 
-# echo '{"registry-mirrors": [ "http://10.16.1.163:5000" ], "max-concurrent-downloads": 5, "hosts" : ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}' >> $DockerSconfig-tmp
-if [[ "DockerSexperimental" != true ]]; then
-  # Enable docker daemon experimental support (for 'docker build --squash').
-  DockerSconfig='/etc/docker/daemon.json'
-  mkdir -p /etc/docker/
-  if [[ -e "$DockerSconfig" ]]; then
-    #_sudo sed -i -e 's/{/{\n"experimental": true,\n/' "$DockerSconfig"
-    _sudo cat "$DockerSconfig" | jq '.experimental = true' >> "$DockerSconfig-tmp"
-    _sudo cp -p "$DockerSconfig" "$DockerSconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerSconfig-tmp" "$DockerSconfig" || exit 1;
-  else
-    _sudo echo {} | jq '.experimental = true' >> "$DockerSconfig-tmp"
-    _sudo touch "$DockerSconfig"
-    _sudo cp -p "$DockerSconfig" "$DockerSconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerSconfig-tmp" "$DockerSconfig" || exit 1;
-    #echo '{ "experimental": true }' | $SUDO tee "$DockerSconfig"
-  fi
-  _dockerRESTART
-   # $SUDO systemctl restart docker
-fi
 
 if [[ "DockerCexperimental" != true ]]; then
   # Enable docker cli experimental support (for 'docker build --squash').
@@ -110,15 +92,38 @@ if [[ "DockerCexperimental" != true ]]; then
     #cat "$DockerCconfig" | jq -M -S | sed -e 's/^{/{ "aliases": { "builder": "buildx" } ,\n/1' | jq -M -S >
     cat "$DockerCconfig" | jq -M | sed -e 's/^{/{ "aliases": { "builder": "buildx" } ,\n/1' | jq -M >> $DockerCconfig-tmp
 #cat $DockerCconfig-tmp | jq --arg aliases builder
-    _sudo cp -p "$DockerCconfig" "$DockerCconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerCconfig-tmp" "$DockerCconfig" || exit 1;
+    cp -p "$DockerCconfig" "$DockerCconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && mv "$DockerCconfig-tmp" "$DockerCconfig" || exit 1;
 else
     #echo '{ "experimental": true }' | _sudo tee "$DockerCconfig"
-    _sudo echo {} | jq '.experimental = true' >> "$DockerSconfig-tmp"
-    _sudo touch "$DockerCconfig"
-    _sudo cp -p "$DockerCconfig" "$DockerCconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerCconfig-tmp" "$DockerCconfig" || exit 1;
+    echo {} | tee -a "$DockerCconfig"
+    echo {} | jq '.experimental = true' >> "$DockerSconfig-tmp"
+    #_sudo touch "$DockerCconfig"
+    cp -p "$DockerCconfig" "$DockerCconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && mv "$DockerCconfig-tmp" "$DockerCconfig" || exit 1;
   fi
   #_dockerRESTART
   #$SUDO systemctl restart docker
 fi
+
+# echo '{"registry-mirrors": [ "http://10.16.1.163:5000" ], "max-concurrent-downloads": 5, "hosts" : ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}' >> $DockerSconfig-tmp
+if [[ "DockerSexperimental" != true ]]; then
+  # Enable docker daemon experimental support (for 'docker build --squash').
+  DockerSconfig='/etc/docker/daemon.json'
+  mkdir -p /etc/docker/
+  if [[ -e "$DockerSconfig" ]]; then
+    #_sudo sed -i -e 's/{/{\n"experimental": true,\n/' "$DockerSconfig"
+    _sudo cat "$DockerSconfig" | jq '.experimental = true' >> "$DockerSconfig-tmp"
+    _sudo cp -p "$DockerSconfig" "$DockerSconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerSconfig-tmp" "$DockerSconfig" || exit 1;
+  else
+    _sudo echo {} | tee -a "$DockerSconfig"
+    #_sudo echo {} | jq '.experimental = true' >> "$DockerSconfig-tmp"
+    _sudo cat "$DockerSconfig"  jq '.experimental = true' >> "$DockerSconfig-tmp"
+    _sudo cp -p "$DockerSconfig" "$DockerSconfig-bakup-$(date +%Y-%m-%dT%H%M%S)" && _sudo mv "$DockerSconfig-tmp" "$DockerSconfig" || exit 1;
+    #echo '{ "experimental": true }' | $SUDO tee "$DockerSconfig"
+  fi
+  _dockerRESTART
+   # $SUDO systemctl restart docker
+fi
+
+
 
 #docker 
