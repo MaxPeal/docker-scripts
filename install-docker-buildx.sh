@@ -83,7 +83,7 @@ _sudo sh -xec '
 # echo '{"registry-mirrors": [ "http://10.16.1.163:5000" ], "max-concurrent-downloads": 5, "hosts" : ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}' >> $DockerSconfig-tmp
 if [[ "DockerSexperimental" != true ]]; then
   # Enable docker daemon experimental support (for 'docker build --squash').
-  local -r DockerSconfig='/etc/docker/daemon.json'
+  DockerSconfig='/etc/docker/daemon.json'
   mkdir -p /etc/docker/
   if [[ -e "$DockerSconfig" ]]; then
     #_sudo sed -i -e 's/{/{\n"experimental": true,\n/' "$DockerSconfig"
@@ -100,7 +100,7 @@ fi
 
 if [[ "DockerCexperimental" != true ]]; then
   # Enable docker cli experimental support (for 'docker build --squash').
-  local -r DockerCconfig="$HOME/.docker/config.json"
+  DockerCconfig="$HOME/.docker/config.json"
   mkdir -p $HOME/.docker/
   if [[ -e "$DockerCconfig" ]]; then
     _sudo sed -i -e 's/{/{ "experimental": true, /' "$DockerCconfig"
