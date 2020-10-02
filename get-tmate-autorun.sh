@@ -418,8 +418,8 @@ execute
 
   tmpfileCONFIGfile=$(mktemp abc-script.XXXXXX)
   tmpfileCONFIG="-f $tmpfileCONFIGfile"
-  #echo "'set -g terminal-overrides \"xterm*:kLFT5=\eOD:kRIT5=\eOC:kUP5=\eOA:kDN5=\eOB:smkx@:rmkx@\"" >> $tmpfile2
-  echo 'set -g terminal-overrides "xterm*:kLFT5=\eOD:kRIT5=\eOC:kUP5=\eOA:kDN5=\eOB:smkx@:rmkx@"' >> $tmpfile2
+  #echo "'set -g terminal-overrides \"xterm*:kLFT5=\eOD:kRIT5=\eOC:kUP5=\eOA:kDN5=\eOB:smkx@:rmkx@\"" >> $tmpfileCONFIGfile
+  echo 'set -g terminal-overrides "xterm*:kLFT5=\eOD:kRIT5=\eOC:kUP5=\eOA:kDN5=\eOB:smkx@:rmkx@"' >> $tmpfileCONFIGfile
 
 execute_auto_setup() {
   tmpdir=$(mktemp -d)
