@@ -26,7 +26,6 @@ parse_args() {
   #BINDIR is ./bin unless set be ENV
   # over-ridden by flag below
 
-  bbbb
   while getopts "b:dh?x" arg; do
     case "$arg" in
       b) BINDIR="$OPTARG" ;;
@@ -419,21 +418,21 @@ execute
 execute_auto_setup() {
   tmpdir=$(mktemp -d)
   log_debug "downloading files into ${tmpdir}"
-  http_download "${tmpdir}/${TARBALL}" "${TARBALL_URL}"
+  #http_download "${tmpdir}/${TARBALL}" "${TARBALL_URL}"
 #SKIP#  http_download "${tmpdir}/${CHECKSUM}" "${CHECKSUM_URL}"
 #SKIP#  hash_sha256_verify "${tmpdir}/${TARBALL}" "${tmpdir}/${CHECKSUM}"
-  srcdir="${tmpdir}/${NAME}"
-  rm -rf "${srcdir}"
-  (cd "${tmpdir}" && untar "${TARBALL}")
-  test ! -d "${BINDIR}" && install -d "${BINDIR}"
-  for binexe in $BINARIES; do
-    if [ "$OS" = "windows" ]; then
-      binexe="${binexe}.exe"
-    fi
-    install "${srcdir}/${binexe}" "${BINDIR}/"
-    log_info "installed ${BINDIR}/${binexe}"
-  done
-  rm -rf "${tmpdir}"
+  #srcdir="${tmpdir}/${NAME}"
+  #rm -rf "${srcdir}"
+  #(cd "${tmpdir}" && untar "${TARBALL}")
+  #test ! -d "${BINDIR}" && install -d "${BINDIR}"
+  #for binexe in $BINARIES; do
+  #  if [ "$OS" = "windows" ]; then
+  #    binexe="${binexe}.exe"
+  #  fi
+  #  install "${srcdir}/${binexe}" "${BINDIR}/"
+  #  log_info "installed ${BINDIR}/${binexe}"
+  #done
+  #rm -rf "${tmpdir}"
   tmpdir2=$(mktemp -d)
   trap "rm -fr $tmpdir2" 0 2 3 15
   tmpfile=$(mktemp $tmpdir2/abc-script.XXXXXX)
@@ -444,7 +443,7 @@ execute_auto_setup() {
 TMATEauthorizedkeysfile=$tmpfile2
 echo "$TMATEauthorizedkeys" >> $TMATEauthorizedkeysfile
 
-TMATEsession
+
 #debugnull
 #tmate -F -k tmk-jPa7GdgslQuqt4PAOHxQRAyJTe -n testname
 ##TMPsession=$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | tr -d [:space:]- )
