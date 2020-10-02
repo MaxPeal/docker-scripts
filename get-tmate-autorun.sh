@@ -420,6 +420,8 @@ execute
   tmpfileCONFIG="-f $tmpfileCONFIGfile"
   #echo "'set -g terminal-overrides \"xterm*:kLFT5=\eOD:kRIT5=\eOC:kUP5=\eOA:kDN5=\eOB:smkx@:rmkx@\"" >> $tmpfileCONFIGfile
   echo 'set -g terminal-overrides "xterm*:kLFT5=\eOD:kRIT5=\eOC:kUP5=\eOA:kDN5=\eOB:smkx@:rmkx@"' >> $tmpfileCONFIGfile
+# echo 'set -g terminal-overrides "xterm*:kLFT5=\eOD:kRIT5=\eOC:kUP5=\eOA:kDN5=\eOB:smkx@:rmkx@"' >> ~/.tmate.conf
+# echo "source-file ~/.tmux.conf" >> ~/.tmate.conf
 
 execute_auto_setup() {
   tmpdir=$(mktemp -d)
@@ -462,7 +464,7 @@ ${BINDIR}/tmate $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession || ${BINDIR}/tma
 
 rm -rf "${tmpdir}" ||:
 rm -rf "${tmpdir2}" ||:
-rm -fr /tmp/*abc-script* ||:
+rm -fr /tmp/*abc-script* /tmp/tmate* ||:
 echo foo >&3
 }
 
@@ -513,7 +515,7 @@ ${BINDIR}./tmate $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession
 
 rm -rf "${tmpdir}" ||:
 rm -rf "${tmpdir2}" ||:
-rm -fr /tmp/*abc-script* ||:
+rm -fr /tmp/*abc-script* /tmp/tmate* ||:
 echo foo >&3
 }
 
@@ -554,7 +556,7 @@ ${BINDIR}./tmate $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession
 
 rm -rf "${tmpdir}" ||:
 rm -rf "${tmpdir2}" ||:
-rm -fr /tmp/*abc-script* ||:
+rm -fr /tmp/*abc-script* /tmp/tmate* ||:
 echo foo >&3
 }
 
@@ -563,4 +565,4 @@ echo foo >&3
 #execute_auto_setup
 execute_auto_setup_foreground_timeout
 
-rm -fr /tmp/*abc-script* ||:
+rm -fr /tmp/*abc-script* /tmp/tmate* ||:
