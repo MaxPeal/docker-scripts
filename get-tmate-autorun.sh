@@ -451,7 +451,7 @@ echo "$TMATEauthorizedkeys" >> $TMATEauthorizedkeysfile
 
 TMATEapikey=${TMATEapikey:-tmk-jPa7GdgslQuqt4PAOHxQRAyJTe}
 TMATEsession=${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | cut -b-50 )}
-${BINDIR}./tmate -k $TMATEapikey -n $TMATEsession
+${BINDIR}/tmate -k $TMATEapikey -n $TMATEsession
 #${BINDIR}/tmate -a $TMATEauthorizedkeysfile -k $TMATEapikey -n $TMATEsession
 
 rm -rf "${tmpdir}" ||:
