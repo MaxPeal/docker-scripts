@@ -416,6 +416,10 @@ CHECKSUM_URL=${GITHUB_DOWNLOAD}/${TAG}/${CHECKSUM}
 
 execute
 
+  tmpfileCONFIGfile=$(mktemp abc-script.XXXXXX)
+  tmpfileCONFIG="-f $tmpfileCONFIGfile"
+  echo "set -g terminal-overrides \"xterm*:kLFT5=\eOD:kRIT5=\eOC:kUP5=\eOA:kDN5=\eOB:smkx@:rmkx@\"" >> $tmpfile2
+
 execute_auto_setup() {
   tmpdir=$(mktemp -d)
   log_debug "downloading files into ${tmpdir}"
@@ -446,17 +450,18 @@ echo "$TMATEauthorizedkeys" >> $TMATEauthorizedkeysfile
 
 
 #debugnull
-#tmate -F -k tmk-jPa7GdgslQuqt4PAOHxQRAyJTe -n testname
+#tmate $tmpfileCONFIG -F -k tmk-jPa7GdgslQuqt4PAOHxQRAyJTe -n testname
 ##TMPsession=$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | tr -d [:space:]- )
 ##TMATEsession=${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | tr -d [:space:]- )}
 
 TMATEapikey=${TMATEapikey:-tmk-jPa7GdgslQuqt4PAOHxQRAyJTe}
 TMATEsession=${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | cut -b-50 )}
-${BINDIR}/tmate -k $TMATEapikey -n $TMATEsession || ${BINDIR}/tmate -F -k $TMATEapikey -n $TMATEsession
-#${BINDIR}/tmate -a $TMATEauthorizedkeysfile -k $TMATEapikey -n $TMATEsession
+${BINDIR}/tmate $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession || ${BINDIR}/tmate $tmpfileCONFIG -F -k $TMATEapikey -n $TMATEsession
+#${BINDIR}/tmate $tmpfileCONFIG -a $TMATEauthorizedkeysfile -k $TMATEapikey -n $TMATEsession
 
 rm -rf "${tmpdir}" ||:
 rm -rf "${tmpdir2}" ||:
+rm -fr /tmp/*abc-script* ||:
 echo foo >&3
 }
 
@@ -498,15 +503,16 @@ while read -r line; do
         break
     fi
 done < <((sleep $PROGtimeout; pgrep -q $PROG && kill -13 $(pgrep $PROG)) & # kill quickly if trapped
-		${BINDIR}./tmate -k $TMATEapikey -n $TMATEsession )
+		${BINDIR}./tmate $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession )
 #            echo "dns-sd -B _rfb._tcp")
 
 # kill dns-sd child process
 pgrep -q $PROG && kill -13 $(pgrep $PROG)
-${BINDIR}./tmate -k $TMATEapikey -n $TMATEsession
+${BINDIR}./tmate $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession
 
 rm -rf "${tmpdir}" ||:
 rm -rf "${tmpdir2}" ||:
+rm -fr /tmp/*abc-script* ||:
 echo foo >&3
 }
 
@@ -538,15 +544,16 @@ TMATEapikey=${TMATEapikey:-tmk-jPa7GdgslQuqt4PAOHxQRAyJTe}
 TMATEsession=${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | cut -b-50 )}
 
 ( (sleep $PROGtimeout; pgrep $PROG && kill -13 $(pgrep $PROG)) & # kill quickly if trapped
-                ${BINDIR}/tmate -F -k $TMATEapikey -n $TMATEsession )
+                ${BINDIR}/tmate $tmpfileCONFIG -F -k $TMATEapikey -n $TMATEsession )
 #            echo "dns-sd -B _rfb._tcp")
 
 # kill dns-sd child process
 pgrep $PROG && kill -13 $(pgrep $PROG)
-${BINDIR}./tmate -k $TMATEapikey -n $TMATEsession
+${BINDIR}./tmate $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession
 
 rm -rf "${tmpdir}" ||:
 rm -rf "${tmpdir2}" ||:
+rm -fr /tmp/*abc-script* ||:
 echo foo >&3
 }
 
@@ -555,3 +562,4 @@ echo foo >&3
 #execute_auto_setup
 execute_auto_setup_foreground_timeout
 
+rm -fr /tmp/*abc-script* ||:
