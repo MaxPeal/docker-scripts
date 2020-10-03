@@ -34,11 +34,12 @@ tmpdir2=${tmpdir2:-$(mktemp -d -t tmp.abc-script2.XXXXXXXXXX)}
 #BINDIR=${BINDIR:-/tmp/tmp/bin}
 
 PROG=tmate
-PROGtimeout=${PROGtimeout:-21600}
+#PROGtimeout=${PROGtimeout:-21600}
+PROGtimeout=${PROGtimeout:-7100}
 # https://docs.travis-ci.com/user/customizing-the-build/#Build-Timeouts
 #7200 2h, 14400 4h, 21600 6h,
 #debuging 
-PROGtimeout="30"
+###PROGtimeout="30"
 date -u
 
 usage() {
@@ -155,12 +156,26 @@ exit 0;
 vsleep_kill () {
 # https://www.cyberciti.biz/faq/linux-run-a-command-with-a-time-limit/
 countdown="$1"
+#countdownZ=0
 prog="$2"
 while :
 do
 #set -vx
     #printf "%b" "${countdown:-0}\n"
-    printf "%b" "${countdown:-0} \n\c"
+    #printf "%b" "${countdown:-0} \n\c"
+	printf "%b" "${countdown:-0} "
+		if [ "${countdownZ:-0}" -gt 20 ]
+		then 
+			#countdownZ=`expr $countdownZ + 1`
+			#countdownZ=1
+			printf "%b" "${countdown:-0} nr${countdownZ} \n\r"
+			countdownZ=1
+		else
+			countdownZ=`expr $countdownZ + 1`
+			#debug#printf "%b" "${countdown:-0} NR${countdownZ} "
+			#countdownZ=1
+		#else return 0
+		fi
     if [ "$countdown" -gt 1 ]
     then countdown=`expr $countdown - 1`
     else 
