@@ -18,6 +18,7 @@ echo $0 $@
 ##TMATEsession=${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | tr -d [:space:]- )}
 ### https://tmate.io/t/debugnull/$TMATEsession
 ## ssh debugnull/$TMATEsession@lon1.tmate.io
+## TMATEapikey=${TMATEapikeyDEBUG:-tmk-jPa7GdgslQuqt4PAOHxQRAyJTe}; 
 ##ssh debugnull/${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | tr -d [:space:]- )}@lon1.tmate.io
 
 
@@ -48,6 +49,7 @@ usage() {
 $this: download go binaries for tmate-io/tmate
 
 Usage: $this [-b] bindir [-d] [tag]
+  -S show login data form ENV keys!
   -L show full logs!
   ##-F run tmate in foreground!
   -T DISABLE run tmate in foreground!
@@ -75,13 +77,15 @@ parse_args() {
   ###BINDIR=${BINDIR:-./bin}
 #  BINDIR=${BINDIR:-/tmp/tmp/bin}
   BINDIR=${BINDIR:-/tmp/bin}
-  while getopts "b:LFDTdh?P:xXvV" arg; do
+  while getopts "b:LFDTSdh?P:xXvV" arg; do
     case "$arg" in
       b) BINDIR="$OPTARG" ;;
       L) LOGS_NOT_MASKING="true" ;;
       #F) TMATE_foreground="true" ;;
       T) TMATE_foreground_DISABLE="true" ;;
       D) TMATE_log_DEBUG="-vvvv" ;;
+      #S) TMATE_show_login_data="true" ;;
+      S) PROGtimeout="3"; TMATE_foreground_DISABLE="false"; LOGS_NOT_MASKING="true"; TMATE_show_login_data="true" ;;
       d) log_set_priority 10 ;;
       P) vsleeeptime="$2"; shift;;
       h | \?) usage "$0" ;;
@@ -629,7 +633,7 @@ tmpfileCONFIGfile=${tmpfileCONFIGfile:-$(mktemp -t abc-script.config.XXXXXXXXXX)
 
   trap '{
     # this block gets called before exit
-set -vx
+#+++set -vx
 rm -rf "${tmpdir}" ||:
 rm -rf "${tmpdir}" ||:
 rm -rf "${tmpdir1}" ||:
@@ -787,8 +791,8 @@ echo "$TMATEauthorizedkeys" >> $TMATEauthorizedkeysfile
 
 TMATEapikey=${TMATEapikey:-tmk-jPa7GdgslQuqt4PAOHxQRAyJTe}
 TMATEsession=${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | cut -b-50 )}
-echo foooooooooooooooooo
-echo $0
+#+++echo foooooooooooooooooo
+#+++echo $0
 ###${BINDIR}/tmate $tmpARGs $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession || ${BINDIR}/tmate $tmpARGs $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession -F | _tmpFILTER
 ${BINDIR}/tmate $tmpARGs $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession 
 #${BINDIR}/tmate $tmpARGs $tmpfileCONFIG -a $TMATEauthorizedkeysfile -k $TMATEapikey -n $TMATEsession
@@ -823,8 +827,8 @@ echo "$TMATEauthorizedkeys" >> "$TMATEauthorizedkeysfile"
 
 TMATEapikey=${TMATEapikey:-tmk-jPa7GdgslQuqt4PAOHxQRAyJTe}
 TMATEsession=${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | cut -b-50 )}
-echo foooooooooooooooooo
-echo $0
+#+++echo foooooooooooooooooo
+#+++echo $0
 ###${BINDIR}/tmate $tmpARGs $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession || ${BINDIR}/tmate $tmpARGs $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession -F | _tmpFILTER
 #${BINDIR}/tmate $tmpARGs $tmpfileCONFIG -a $TMATEauthorizedkeysfile -k $TMATEapikey -n $TMATEsession
 
@@ -875,8 +879,8 @@ echo "$TMATEauthorizedkeys" >> $TMATEauthorizedkeysfile
 TMATEapikey=${TMATEapikey:-tmk-jPa7GdgslQuqt4PAOHxQRAyJTe}
 TMATEsession=${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | cut -b-50 )}
 
-echo foooooooooooooooooo
-echo $0
+#+++echo foooooooooooooooooo
+#+++echo $0
 
 out=(); i=0
 while read -r line; do
@@ -929,8 +933,8 @@ TMATEsession=${TMATEsession:-$(echo $TMATEapikey$(date -u +%F%H) | sha256sum | c
 
 #( (sleep $PROGtimeout; pgrep -x $PROG && kill $(pgrep -x $PROG); kill -13 $(pgrep -x $PROG)) & # kill quickly if trapped
 #( (vsleep $PROGtimeout; pgrep $PROG && ( kill $(pgrep -x $PROG); kill -13 $(pgrep -x $PROG) ) ) & # kill quickly if trapped
-echo foooooooooooooooooo
-echo $0
+#+++echo foooooooooooooooooo
+#+++echo $0
 #( ( vsleep $PROGtimeout; pgrep $PROG && kill $(pgrep -x $PROG) ) & # kill quickly if trapped
 ###( ( vsleep $PROGtimeout; pgrep $PROG; kill $(pgrep -x $PROG ) ) & # kill quickly if trapped
 ###   ${BINDIR}/tmate $tmpARGs $tmpfileCONFIG -k $TMATEapikey -n $TMATEsession -F | _tmpFILTER )
@@ -952,6 +956,14 @@ rm -rf "${tmpfile2}" ||:
 #rm -fr /tmp/*abc-script* ||:
 ####echo foo >&3
 }
+
+
+if [ "$TMATE_foreground_DISABLE" = "true" ]; then 
+#execute_auto_setup
+execute_auto_setup_timeout
+else
+execute_auto_setup_foreground_timeout
+fi
 
 
 
