@@ -13,30 +13,114 @@
 #
 
 
-set -e
+###set -e
 
 #set -vx
 
+PROG=$(basename $0)
+PROGdir=$(dirname $0)
+
 #VERSION="1.27.4"
 #IMAGE="docker/compose:$VERSION"
-#VERSION="f5.1.0"
-VERSION="d5.1"
+VERSION="f5.1.0"
+#VERSION="d5.1"
 IMAGE="aptman/qus:$VERSION"
 qemu_dir="/usr/local/bin/qemu/"
-qemu_dir_in_image="/qus/bin/"
-WORK_DIR=""
+qemu_dir_in_image="/qus/bin"
+#WORK_DIR=""
 #entrypoint="/qus/bin/qemu-aarch64-static"
 entrypoint="/qus/bin/$PROG"
 
+############################################################################################
+# form https://github.com/barisione/clang-format-hooks/blob/master/git-pre-commit-format#L34-L42
+# realpath is not available everywhere.
+
+readlink() {
+    if _has_command readlink; then
+        _system_readlink "$@"
+    else
+        _emulated_readlink "$@"
+    fi
+}
+
+_has_command() {
+    hash -- "$1" 2>/dev/null
+}
+
+_system_readlink() {
+    command readlink "$@"
+}
+
+_emulated_readlink() {
+    if [ "$1" = -- ]; then
+        shift
+    fi
+
+    echo "ERROR ERROR command readlink missing!"
+	exit 1
+}
+
+realpath() {
+    if _has_command realpath; then
+        _system_realpath "$@"
+    else
+        _emulated_realpath "$@"
+    fi
+}
+
+_system_realpath() {
+    command readlink "$@"
+}
+
+_emulated_realpath() {
+    if [ "$1" = -- ]; then
+        shift
+    fi
+
+    # Python should always be available on macOS.
+    # We use sys.stdout.write instead of print so it's compatible with both Python 2 and 3.
+    python -c "import sys; import os.path; sys.stdout.write(os.path.realpath('''$1''') + '\\n')"
+
+}
 
 
+############################################################################################
+
+#set -vx
+PROGbasename=$(basename $0)
+PROGrealpath=$(realpath $0)
+PROGrealpathBASENAME=$(basename $PROGrealpath)
+##PROGreadlink=$(readlink $0)
+##PROGreadlinkM=$(readlink -m)
+
+#set -vx
+#echo $PROGbasename
+#echo $PROGrealpath
+#echo $PROGrealpathBASENAME
+#echo $PROGreadlink
+#set +vx
+
+if [ "$PROGbasename" = "$PROGrealpathBASENAME" ]; then
+    echo "PROGbasename GLEICH PROGrealpathBASENAME"
+	echo "do the setup with $PROGbasename -S"
+else
+ #   echo "PROGbasename nicht PROGrealpathBASENAME"
+ foo=""
+fi
+
+
+
+if [ "$PROGbasename" = "$PROGrealpathBASENAME" ]; then
+    #echo "PROGbasename GLEICH PROGrealpathBASENAME"
 # A POSIX variable
 OPTIND=1 # Reset in case getopts has been used previously in the shell.
 PROG_SETUP=1
 
-while getopts "Sr:v:t:d:" opt; do
+while getopts "STr:v:t:d:" opt; do
     case "$opt" in
         S)  PROG_SETUP=$OPTARG
+        ;;
+        T)  SMOKE_TEST=$OPTARG
         ;;
         r)  REPO=$OPTARG
         ;;
@@ -65,7 +149,6 @@ shift $((OPTIND-1))
 # WORKING # docker run --rm -t --entrypoint="" aptman/qus /qus/bin/qemu-aarch64-static --version
 # WORKING # docker run --rm -t multiarch/qemu-user-static:x86_64-aarch64 /usr/bin/qemu-aarch64-static --version
 
-PROG=$(basename $0)
 
 if [ -z "$PROG_SETUP" ]; then
 #echo "ln -s $PROG qemu-{aarch64,aarch64_be,alpha,armeb,arm,cris,hppa,i386,m68k,microblazeel,microblaze,mips64el,mips64,mipsel,mipsn32el,mipsn32,mips,nios2,or1k,ppc64abi32,ppc64le,ppc64,ppc,riscv32,riscv64,s390x,sh4eb,sh4,sparc32plus,sparc64,sparc,tilegx,x86_64,xtensaeb,xtensa}-static"
@@ -76,9 +159,25 @@ for to_arch in $to_archs; do
     echo "ln -s $PROG qemu-${to_arch}-static"
     ln -s $PROG qemu-${to_arch}-static
 done
+fi
+
+
+if [ -z "$SMOKE_TEST" ]; then
+to_archs="aarch64 aarch64_be alpha armeb arm cris hppa i386 m68k microblazeel microblaze mips64el mips64 mipsel mipsn32el mipsn32 mips nios2 or1k ppc64abi32 ppc64le ppc64 ppc riscv32 riscv64 s390x sh4eb sh4 sparc32plus sparc64 sparc tilegx x86_64 xtensaeb xtensa"
+
+for to_arch in $to_archs; do
+	echo 
+    echo "qemu-${to_arch}-static"
+    $PROGdir/qemu-${to_arch}-static
+    $PROGdir/qemu-${to_arch}-static --version
+done
+fi
+
+#
+
 
 else
-
+###    echo "PROGbasename nicht PROGrealpathBASENAME"
 
 
 # Setup options for connecting to docker host
@@ -134,7 +233,15 @@ if docker info --format '{{json .SecurityOptions}}' 2>/dev/null | grep -q 'name=
     DOCKER_RUN_OPTIONS="$DOCKER_RUN_OPTIONS --userns=host"
 fi
 
+if [ -n "$WORK_DIR" ]; then
+    WORK_DIR_OPTIONS="-w $(WORK_DIR)"
+fi
+
+
 # shellcheck disable=SC2086
 #exec docker run --entrypoint="" --rm $DOCKER_RUN_OPTIONS $DOCKER_ADDR $COMPOSE_OPTIONS $VOLUMESfoo -w "$(pwd)" $IMAGE "$@"
-exec docker run --entrypoint="$entrypoint" --rm $DOCKER_RUN_OPTIONS $DOCKER_ADDR $COMPOSE_OPTIONS $VOLUMESfoo -w "$(WORK_DIR)" $IMAGE "$@"
+if [ -z "$SMOKE_TEST" ]; then
+set -x
+fi
+exec docker run --entrypoint="$entrypoint" --rm $DOCKER_RUN_OPTIONS $DOCKER_ADDR $COMPOSE_OPTIONS $VOLUMESfoo $WORK_DIR_OPTIONS $IMAGE $qemu_dir_in_image/$PROGbasename "$@"
 fi
