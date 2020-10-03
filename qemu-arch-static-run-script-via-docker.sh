@@ -13,7 +13,7 @@
 #
 
 
-###set -e
+set -e
 
 #set -vx
 
@@ -22,14 +22,15 @@ PROGdir=$(dirname $0)
 
 #VERSION="1.27.4"
 #IMAGE="docker/compose:$VERSION"
-VERSION="f5.1.0"
-#VERSION="d5.1"
+#VERSION="f5.1.0"
+VERSION="d5.1"
 IMAGE="aptman/qus:$VERSION"
 qemu_dir="/usr/local/bin/qemu/"
 qemu_dir_in_image="/qus/bin"
 #WORK_DIR=""
 #entrypoint="/qus/bin/qemu-aarch64-static"
-entrypoint="/qus/bin/$PROG"
+#not working# entrypoint="/qus/bin/$PROG"
+entrypoint=""
 
 ############################################################################################
 # form https://github.com/barisione/clang-format-hooks/blob/master/git-pre-commit-format#L34-L42
@@ -69,7 +70,8 @@ realpath() {
 }
 
 _system_realpath() {
-    command readlink "$@"
+    #command readlink "$@"
+    command realpath "$@"
 }
 
 _emulated_realpath() {
@@ -88,10 +90,19 @@ _emulated_realpath() {
 
 #set -vx
 PROGbasename=$(basename $0)
-PROGrealpath=$(realpath $0)
+PROGrealpath=$(realpath $0 ||:)
+# fixme
+[ "$PROGrealpath" = "" ] && PROGrealpath="$PROGbasename"
 PROGrealpathBASENAME=$(basename $PROGrealpath)
 ##PROGreadlink=$(readlink $0)
 ##PROGreadlinkM=$(readlink -m)
+
+emuPROGbasename=$(basename $1 ||:)
+emuPROGrealpath=$(realpath $1 ||:)
+# fixme
+###[ "$emuPROGrealpath" = "" ] && emuPROGrealpath="$emuPROGbasename"
+emuPROGrealpathBASENAME=$(basename $emuPROGrealpath ||:)
+
 
 #set -vx
 #echo $PROGbasename
@@ -115,12 +126,12 @@ if [ "$PROGbasename" = "$PROGrealpathBASENAME" ]; then
 # A POSIX variable
 OPTIND=1 # Reset in case getopts has been used previously in the shell.
 PROG_SETUP=1
-
-while getopts "STr:v:t:d:" opt; do
+SMOKE_TEST=1
+while getopts "ISr:v:t:d:" opt; do
     case "$opt" in
-        S)  PROG_SETUP=$OPTARG
+        I)  PROG_SETUP=$OPTARG
         ;;
-        T)  SMOKE_TEST=$OPTARG
+        S)  SMOKE_TEST=$OPTARG
         ;;
         r)  REPO=$OPTARG
         ;;
@@ -164,11 +175,12 @@ fi
 
 if [ -z "$SMOKE_TEST" ]; then
 to_archs="aarch64 aarch64_be alpha armeb arm cris hppa i386 m68k microblazeel microblaze mips64el mips64 mipsel mipsn32el mipsn32 mips nios2 or1k ppc64abi32 ppc64le ppc64 ppc riscv32 riscv64 s390x sh4eb sh4 sparc32plus sparc64 sparc tilegx x86_64 xtensaeb xtensa"
-
+set +e
 for to_arch in $to_archs; do
 	echo 
+	echo 
     echo "qemu-${to_arch}-static"
-    $PROGdir/qemu-${to_arch}-static
+#    $PROGdir/qemu-${to_arch}-static
     $PROGdir/qemu-${to_arch}-static --version
 done
 fi
@@ -241,7 +253,11 @@ fi
 # shellcheck disable=SC2086
 #exec docker run --entrypoint="" --rm $DOCKER_RUN_OPTIONS $DOCKER_ADDR $COMPOSE_OPTIONS $VOLUMESfoo -w "$(pwd)" $IMAGE "$@"
 if [ -z "$SMOKE_TEST" ]; then
+#echo "SMOKE TEST"
 set -x
+#set -e
 fi
-exec docker run --entrypoint="$entrypoint" --rm $DOCKER_RUN_OPTIONS $DOCKER_ADDR $COMPOSE_OPTIONS $VOLUMESfoo $WORK_DIR_OPTIONS $IMAGE $qemu_dir_in_image/$PROGbasename "$@"
+shift
+exec docker run --entrypoint="$entrypoint" --rm $DOCKER_RUN_OPTIONS $DOCKER_ADDR $COMPOSE_OPTIONS $VOLUMESfoo $WORK_DIR_OPTIONS -v "$emuPROGrealpath":"$emuPROGrealpath":ro $IMAGE $qemu_dir_in_image/$PROGbasename $emuPROGrealpath "$@"
+#-v "$(pwd)":"$(pwd)"
 fi
