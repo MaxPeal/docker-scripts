@@ -22,11 +22,39 @@ set -x
 #https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.2.darwin-amd64
 #https://github.com/docker/buildx/releases/download/v0.4.2/buildx-v0.4.2.windows-amd64.exe
 
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.darwin-amd64
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.darwin-arm64
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-amd64
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-arm-v6
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-arm-v7
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-arm64
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-ppc64le
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-riscv64
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.linux-s390x
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.windows-amd64.exe
+#https://github.com/docker/buildx/releases/download/v0.8.2/buildx-v0.8.2.windows-arm64.exe
+#https://github.com/docker/buildx/releases/download/v0.8.2/checksums.txt 
+
+# 95303b8b017d6805d35768244e66b41739745f81cb3677c0aefea231e484e227  buildx-v0.8.2.darwin-amd64
+# 145b51d31d04fc20486f5536267936fd5c25f02cdde8df91e255812cd41c4908  buildx-v0.8.2.darwin-arm64
+# c64de4f3c30f7a73ff9db637660c7aa0f00234368105b0a09fa8e24eebe910c3  buildx-v0.8.2.linux-amd64
+# d0e5d19cd67ea7a351e3bfe1de96f3d583a5b80f1bbadd61f7adcd61b147e5f5  buildx-v0.8.2.linux-arm-v6
+# b5bb1e28e9413a75b2600955c486870aafd234f69953601eecc3664bd3af7463  buildx-v0.8.2.linux-arm-v7
+# 304d3d9822c75f98ad9cf57f0c234bcf326bbb96d791d551728cadd72a7a377f  buildx-v0.8.2.linux-arm64
+# 32b317d86c700d920468f162f93ae2282777da556ee49b4329f6c72ee2b11b85  buildx-v0.8.2.linux-ppc64le
+# 76d5fcf92ffa31b3e470d8ec1ab11f7b6997729e5c94d543fec765ad79ad0630  buildx-v0.8.2.linux-riscv64
+# ec4bb6f271f38dca5a377a70be24ee2108a85f6e6ba511ad3b805c4f1602a0d2  buildx-v0.8.2.linux-s390x
+# abd54d5a589c7745b67990b4fdbd489c922864e3725353faf6859ceed835dd4a  buildx-v0.8.2.windows-amd64.exe
+# 8fe575d9346d30e97240ee0dd85c22b5974e8ee898a5fd26ab0d7e6792bc3cf8  buildx-v0.8.2.windows-arm64.exe
+# 539f924ef1ea1645f1e164472e183202fce11b608bccfeefe0f66e94f58bde57  checksums.txt
+
+
 #HFILE=docker-buildx HDIR=~/.docker/cli-plugins HASHcmd=sha256sum HASHSUM=$HASHSUM$(uname -m) HURL=$HURL$(uname -m)
 #HFILE=docker-buildx HDIR=~/.docker/cli-plugins HASHcmd=sha256sum HASHSUM=$(eval $HASHSUM$UNAMEM ) HURL=($HURL$UNAMEM)
 HFILE=docker-buildx HDIR=~/.docker/cli-plugins HASHcmd=sha256sum 
 HURLbase=https://github.com/docker/buildx/releases/download
-HURLver=v0.4.2
+#HURLver=v0.4.2
+HURLver=v0.8.2
 UNAMEM=$(uname -m)
 UNAMEO=$(uname -o)
 UNAMES=$(uname -s)
@@ -37,16 +65,21 @@ UNAMES=$(uname -s)
     
    case "$OSvar-$UNAMEM" in \
        linux-armhf) ARCH='arm' ;; \
-       linux-armv6*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v6 ; HASHSUM=ef7790935ab148c6bae7182c228834ab21f6a758e7adf35768351f970d1cbe65 ;; \
-       linux-armv7*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v7 ; HASHSUM=8f0e32c9944c54aafb68887080fb8a973d9d6230e682a27a0b4edeede0dba757 ;; \
-       linux-aarch64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm64 ; HASHSUM=5be8043acfc2dce0550bc249c348d853e8f4548c45c264102e5250ebcaf3d291 ;; \
-        linux-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=c21f07356de93a4fa5d1b7998252ea5f518dbe94ae781e0edeec7d7e29fdf899 ;; \
-        linux-ppc64le) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-ppc64le ; HASHSUM=92a23faca38d1f571584c8603c4f59bfeb09e21ef5f3dffa0bba36d272c07e65 ;; \
-        linux-s390x) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-s390x ; HASHSUM=82631e68e21bcb544d3dd407da34c0a2cd59df860ba3c7505a2d6b2629bb95a9 ;; \
-        darwin-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=XXX ;; \
-        windows-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=XXX ;; \
+       linux-armv6*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v6 ; HASHSUM=d0e5d19cd67ea7a351e3bfe1de96f3d583a5b80f1bbadd61f7adcd61b147e5f5 ;; \
+       linux-armv7*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v7 ; HASHSUM=b5bb1e28e9413a75b2600955c486870aafd234f69953601eecc3664bd3af7463 ;; \
+       linux-aarch64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm64 ; HASHSUM=304d3d9822c75f98ad9cf57f0c234bcf326bbb96d791d551728cadd72a7a377f ;; \
+        linux-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=c64de4f3c30f7a73ff9db637660c7aa0f00234368105b0a09fa8e24eebe910c3 ;; \
+        linux-ppc64le) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-ppc64le ; HASHSUM=32b317d86c700d920468f162f93ae2282777da556ee49b4329f6c72ee2b11b85 ;; \
+        linux-riscv64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-riscv64 ; HASHSUM=76d5fcf92ffa31b3e470d8ec1ab11f7b6997729e5c94d543fec765ad79ad0630 ;; \
+	linux-s390x) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-s390x ; HASHSUM=ec4bb6f271f38dca5a377a70be24ee2108a85f6e6ba511ad3b805c4f1602a0d2 ;; \
+        darwin-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=95303b8b017d6805d35768244e66b41739745f81cb3677c0aefea231e484e227 ;; \
+	darwin-aarch64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm64 ; HASHSUM=145b51d31d04fc20486f5536267936fd5c25f02cdde8df91e255812cd41c4908 ;; \
+        windows-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=abd54d5a589c7745b67990b4fdbd489c922864e3725353faf6859ceed835dd4a ;; \
+	windows-aarch64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=8fe575d9346d30e97240ee0dd85c22b5974e8ee898a5fd26ab0d7e6792bc3cf8 ;; \
         *) echo >&2 "error: unsupported architecture: UNAMEM: $UNAMEM, UNAMEO: $UNAMEO, UNAMES: $UNAMES,"; exit 1 ;; \
    esac &&
+
+
 
 
 printf "HFILE=$HFILE HDIR=$HDIR HASHcmd=$HASHcmd HASHSUM=$HASHSUM HURL=$HURL"
