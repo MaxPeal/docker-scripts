@@ -52,7 +52,8 @@ UNAMES=$(uname -s)
 printf "HFILE=$HFILE HDIR=$HDIR HASHcmd=$HASHcmd HASHSUM=$HASHSUM HURL=$HURL"
 
 
-( (cd $HDIR && printf %b $HASHSUM\\040\\052$HFILE\\012 | $HASHcmd -c -) && printf %b "SKIP DOWNLOAD\\040\\012" ) || curl -o $HFILE -LR -f -S --connect-timeout 15 --max-time 600 --retry 3 --dump-header - --compressed --verbose $HURL ; (printf %b CHECKSUM\\072\\040expect\\040this\\040$HASHcmd\\072\\040$HASHSUM\\040\\052$HFILE\\012 ; printf %b $HASHSUM\\040\\052$HFILE\\012 | $HASHcmd -c - ;) || (printf %b ERROR\\072\\040CHECKSUMFAILD\\072\\040the\\040file\\040has\\040this\\040$HASHcmd\\072\\040 ; $HASHcmd -b $HFILE ; exit 1)
+( (cd $HDIR && printf %b $HASHSUM\\040\\052$HFILE\\012 | $HASHcmd -c -) && printf %b "SKIP DOWNLOAD\\040\\012" ) || curl -o $HFILE -LR -f -S --connect-timeout 15 --max-time 600 --retry 3 --dump-header - --compressed --verbose $HURL ; (printf %b CHECKSUM\\072\\040expect\\040this\\040$HASHcmd\\072\\040$HASHSUM\\040\\052$HFILE\\012 ; printf %b $HASHSUM\\040\\052$HFILE\\012 | $HASHcmd -c - ;) || (printf %b ERROR\\072\\040CHECKSUMFAILD\\072\\040the\\040file\\040has\\040this\\040$HASHcmd\\072\\040 ; $HASHcmd -b $HFILE ; exit 1) \
+|| ( (cd $HDIR && printf %b $HASHSUM\\040\\052$HFILE\\012 | $HASHcmd -c -) && printf %b "SKIP DOWNLOAD\\040\\012" ) || wget -O $HFILE $HURL ; (printf %b CHECKSUM\\072\\040expect\\040this\\040$HASHcmd\\072\\040$HASHSUM\\040\\052$HFILE\\012 ; printf %b $HASHSUM\\040\\052$HFILE\\012 | $HASHcmd -c - ;) || (printf %b ERROR\\072\\040CHECKSUMFAILD\\072\\040the\\040file\\040has\\040this\\040$HASHcmd\\072\\040 ; $HASHcmd -b $HFILE ; exit 1) \
 # FIXME
 mkdir -p "${HDIR}"
 mv "${HFILE}" "${HDIR}"/"${HFILE}" ||:
