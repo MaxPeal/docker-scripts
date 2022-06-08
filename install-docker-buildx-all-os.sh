@@ -61,10 +61,10 @@ UNAMES=$(uname -s | tr '[:upper:]' '[:lower:]')
     case "$UNAMES" in \
         linux*) OSvar='linux' ;; \
 	darwin*) OSvar='darwin' ;; \
-	msys*) os="windows" ;;
-	mingw*) os="windows" ;;
-	cygwin*) os="windows" ;;
-	win*) os="windows" ;; # for windows busybox and like # https://frippery.org/busybox/
+	msys*) OSvar="windows" ;;
+	mingw*) OSvar="windows" ;;
+	cygwin*) OSvar="windows" ;;
+	win*) OSvar="windows" ;; # for windows busybox and like # https://frippery.org/busybox/
         *) echo >&2 "error: unsupported OS: UNAMEM: $UNAMEM, UNAMEO: $UNAMEO, UNAMES: $UNAMES,"; exit 1 ;; \
     esac &&
     
@@ -162,8 +162,8 @@ DockerServerVersion=$(docker version --format '{{.Server.Version}}' 2>/dev/null 
 DockerSexperimental=$(docker version --format '{{.Server.Experimental}}' 2>/dev/null || docker info --format '{{.ExperimentalBuild}}' 2>/dev/null)
 
 
-[ -e $HOME/.docker ] || mkdir -p $HOME/.docker
-[ -s $HOME/.docker/config.json ] || echo "{}" > $HOME/.docker/config.json
+[ -e "$HOME"/.docker ] || mkdir -p "$HOME/.docker
+[ -s "$HOME"/.docker/config.json ] || echo "{}" > "$HOME"/.docker/config.json
 
 
 
