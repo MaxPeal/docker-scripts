@@ -162,7 +162,7 @@ DockerServerVersion=$(docker version --format '{{.Server.Version}}' 2>/dev/null 
 DockerSexperimental=$(docker version --format '{{.Server.Experimental}}' 2>/dev/null || docker info --format '{{.ExperimentalBuild}}' 2>/dev/null)
 
 
-[ -e "$HOME"/.docker ] || mkdir -p "$HOME/.docker
+[ -e "$HOME"/.docker ] || mkdir -p "$HOME"/.docker
 [ -s "$HOME"/.docker/config.json ] || echo "{}" > "$HOME"/.docker/config.json
 
 
