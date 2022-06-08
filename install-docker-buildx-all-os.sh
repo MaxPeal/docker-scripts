@@ -69,8 +69,7 @@ UNAMES=$(uname -s | tr '[:upper:]' '[:lower:]')
     esac &&
     
    case "$OSvar-$UNAMEM" in \
-       linux-armhf) ARCH='arm' ;; \
-       linux-armv6*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v6 ; HASHSUM=d0e5d19cd67ea7a351e3bfe1de96f3d583a5b80f1bbadd61f7adcd61b147e5f5 ;; \
+       linux-armhf|linux-armv6*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v6 ; HASHSUM=d0e5d19cd67ea7a351e3bfe1de96f3d583a5b80f1bbadd61f7adcd61b147e5f5 ;; \
        linux-armv7*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v7 ; HASHSUM=b5bb1e28e9413a75b2600955c486870aafd234f69953601eecc3664bd3af7463 ;; \
        linux-aarch64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm64 ; HASHSUM=304d3d9822c75f98ad9cf57f0c234bcf326bbb96d791d551728cadd72a7a377f ;; \
         linux-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=c64de4f3c30f7a73ff9db637660c7aa0f00234368105b0a09fa8e24eebe910c3 ;; \
