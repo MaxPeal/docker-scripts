@@ -79,9 +79,9 @@ UNAMES=$(uname -s | tr '[:upper:]' '[:lower:]')
 	linux-s390x) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-s390x ; HASHSUM=ec4bb6f271f38dca5a377a70be24ee2108a85f6e6ba511ad3b805c4f1602a0d2 ;; \
         darwin-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=95303b8b017d6805d35768244e66b41739745f81cb3677c0aefea231e484e227 ;; \
 	darwin-aarch64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm64 ; HASHSUM=145b51d31d04fc20486f5536267936fd5c25f02cdde8df91e255812cd41c4908 ;; \
-        windows-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64.exe ; HASHSUM=abd54d5a589c7745b67990b4fdbd489c922864e3725353faf6859ceed835dd4a ; HDIR=~/.docker/cli-plugins ; HFILE=docker-buildx.exe ;; \
+	windows-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64.exe ; HASHSUM=abd54d5a589c7745b67990b4fdbd489c922864e3725353faf6859ceed835dd4a ; HDIR=~/.docker/cli-plugins ; HFILE=docker-buildx.exe ;; \
 	windows-aarch64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm64.exe ; HASHSUM=8fe575d9346d30e97240ee0dd85c22b5974e8ee898a5fd26ab0d7e6792bc3cf8 ; HDIR=~/.docker/cli-plugins ; HFILE=docker-buildx.exe ;; \
-        *) echo >&2 "error: unsupported architecture: UNAMEM: $UNAMEM, UNAMEO: $UNAMEO, UNAMES: $UNAMES,"; exit 1 ;; \
+	*) echo >&2 "error: unsupported architecture: UNAMEM: $UNAMEM, UNAMEO: $UNAMEO, UNAMES: $UNAMES,"; exit 1 ;; \
    esac &&
 	# see https://docs.docker.com/buildx/working-with-buildx/#manual-download
 	## # %USERPROFILE%\.docker\cli-plugins
