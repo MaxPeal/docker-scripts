@@ -1,5 +1,7 @@
 #!/bin/bash
 
+{ # this ensures the entire script is downloaded #
+
 set -x
 
 function install_docker_buildx() {
@@ -33,18 +35,19 @@ UNAMES=$(uname -s)
         *) echo >&2 "error: unsupported OS: UNAMEM: $UNAMEM, UNAMEO: $UNAMEO, UNAMES: $UNAMES,"; exit 1 ;; \
     esac &&
     
- case "$OSvar" in \
-   linux) case "$UNAMEM" in \
-       armhf) ARCH='arm' ;; \
-       armv6*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v6 ; HASHSUM=ef7790935ab148c6bae7182c228834ab21f6a758e7adf35768351f970d1cbe65 ;; \
-       armv7*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v7 ; HASHSUM=8f0e32c9944c54aafb68887080fb8a973d9d6230e682a27a0b4edeede0dba757 ;; \
-       aarch64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm64 ; HASHSUM=5be8043acfc2dce0550bc249c348d853e8f4548c45c264102e5250ebcaf3d291 ;; \
-        x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=c21f07356de93a4fa5d1b7998252ea5f518dbe94ae781e0edeec7d7e29fdf899 ;; \
-        x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-ppc64le ; HASHSUM=92a23faca38d1f571584c8603c4f59bfeb09e21ef5f3dffa0bba36d272c07e65 ;; \
-        x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-s390x ; HASHSUM=82631e68e21bcb544d3dd407da34c0a2cd59df860ba3c7505a2d6b2629bb95a9 ;; \
+   case "$OSvar-$UNAMEM" in \
+       linux-armhf) ARCH='arm' ;; \
+       linux-armv6*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v6 ; HASHSUM=ef7790935ab148c6bae7182c228834ab21f6a758e7adf35768351f970d1cbe65 ;; \
+       linux-armv7*) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm-v7 ; HASHSUM=8f0e32c9944c54aafb68887080fb8a973d9d6230e682a27a0b4edeede0dba757 ;; \
+       linux-aarch64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-arm64 ; HASHSUM=5be8043acfc2dce0550bc249c348d853e8f4548c45c264102e5250ebcaf3d291 ;; \
+        linux-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=c21f07356de93a4fa5d1b7998252ea5f518dbe94ae781e0edeec7d7e29fdf899 ;; \
+        linux-ppc64le) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-ppc64le ; HASHSUM=92a23faca38d1f571584c8603c4f59bfeb09e21ef5f3dffa0bba36d272c07e65 ;; \
+        linux-s390x) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-s390x ; HASHSUM=82631e68e21bcb544d3dd407da34c0a2cd59df860ba3c7505a2d6b2629bb95a9 ;; \
+        darwin-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=XXX ;; \
+        windows-x86_64) HURL=${HURLbase}/${HURLver}/buildx-${HURLver}.${OSvar}-amd64 ; HASHSUM=XXX ;; \
         *) echo >&2 "error: unsupported architecture: UNAMEM: $UNAMEM, UNAMEO: $UNAMEO, UNAMES: $UNAMES,"; exit 1 ;; \
-      esac &&
- esac &&
+   esac &&
+
 
 printf "HFILE=$HFILE HDIR=$HDIR HASHcmd=$HASHcmd HASHSUM=$HASHSUM HURL=$HURL"
 
@@ -206,3 +209,6 @@ install_docker_buildx
 ###_do_dockerServerExperimental
 
 #docker 
+
+
+} # this ensures the entire script is downloaded #
