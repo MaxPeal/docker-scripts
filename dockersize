@@ -1,0 +1,24 @@
+#!/bin/sh
+
+#dockersize() { docker manifest inspect -v "$1" | jq -c 'if type == "array" then .[] else . end' |  jq -r '[ ( .Descriptor.platform | [ .os, .architecture, .variant, ."os.version" ] | del(..|nulls) | join("/") ), ( [ .SchemaV2Manifest.layers[].size ] | add ) ] | join(" ")' | numfmt --to iec --format '%.2f' --field 2 | column -t ; }
+
+# from https://stackoverflow.com/questions/33352901/get-the-size-of-a-docker-image-before-a-pull
+# https://stackoverflow.com/a/73108928/16596104
+# https://gist.github.com/MichaelSimons/fb588539dcefd9b5fdf45ba04c302db6?permalink_comment_id=4243739#gistcomment-4243739
+
+
+# Getting compressed image size before pull for any registry that serves Image Manifest V2:
+
+#    Uses docker manifest inspect (available by default in recent Docker versions)
+#    Parses and sums layer sizes from the manifest using jq
+#    Formats sizes to iec standard using numfmt (not si, sizes in manifests are 1024-based)
+#    Supports multi-arch manifests
+
+
+# For Debian users: apt-get install jq
+# For Mac users: brew install coreutils jq (coreutils ships numfmt)
+
+dockersize() { docker manifest inspect -v "$1" | jq -c 'if type == "array" then .[] else . end' |  jq -r '[ ( .Descriptor.platform | [ .os, .architecture, .variant, ."os.version" ] | del(..|nulls) | join("/") ), ( [ .SchemaV2Manifest.layers[].size ] | add ) ] | join(" ")' | numfmt --to iec --format '%.2f' --field 2 | sort | column -t ; }
+
+echo "compressed image size:"
+dockersize "$@"
